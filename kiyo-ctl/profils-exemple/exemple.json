@@ -1,0 +1,16 @@
+{
+  "exposure_auto": 8,
+  "exposure_priority": 1,
+  "focus_auto": 0,
+  "focus": 170,
+  "white_balance_auto": 1,
+  "anti_flicker": 1,
+  "zoom": 100,
+  "pantilt": [0, 0],
+  "brightness": 128,
+  "contrast": 128,
+  "saturation": 128,
+  "sharpness": 128,
+  "backlight": 0,
+  "gain": 0
+}

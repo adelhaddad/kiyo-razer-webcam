@@ -1,0 +1,4 @@
+#!/bin/bash
+# Raccourci : ./kiyo list, ./kiyo set focus=177, ./kiyo load perso ...
+cd "$(dirname "$0")"
+exec .venv/bin/python kiyoctl.py "$@"

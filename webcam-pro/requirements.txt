@@ -1,0 +1,6 @@
+numpy
+opencv-contrib-python<5
+mediapipe
+torch
+torchvision
+gfpgan

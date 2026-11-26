@@ -1,0 +1,33 @@
+# --- Données personnelles : JAMAIS dans le dépôt ---
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.gif
+*.bmp
+*.tif
+*.tiff
+*.webp
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.json
+!kiyo-ctl/profils-exemple/*.json
+
+# --- Modèles d'IA (téléchargés par installer.sh, trop lourds / licences propres) ---
+*.pth
+*.onnx
+*.tflite
+*.pt
+*.bin
+webcam-pro/gfpgan/
+webcam-pro/models/
+
+# --- Environnements et fichiers générés ---
+.venv/
+__pycache__/
+*.pyc
+kiyo-ctl/uvcreq
+.DS_Store
+*.log
