@@ -1,76 +1,78 @@
-# kiyo-ctl — réglages de la Razer Kiyo sous macOS
+# kiyo-ctl — Razer Kiyo controls for macOS
 
-Outil en ligne de commande pour la **Razer Kiyo d'origine** (USB `1532:0E03`), sans Synapse.
-Inspiré de [kiyo-control](https://github.com/f0ns/kiyo-control) et [cameractrls](https://github.com/soyersoyer/cameractrls),
-qui ne gèrent que les Kiyo Pro / Pro Ultra / V2. Écrit à partir de la spécification USB Video Class 1.0 et
-des descripteurs lus sur la caméra.
+**English** | [Français](README.fr.md)
 
-## Installation
+Command-line tool for the **original Razer Kiyo** (USB `1532:0E03`), no Synapse needed.
+Inspired by [kiyo-control](https://github.com/f0ns/kiyo-control) and [cameractrls](https://github.com/soyersoyer/cameractrls),
+which only support the Kiyo Pro / Pro Ultra / V2. Written from the USB Video Class 1.0 specification and
+the descriptors read from the camera.
+
+## Install
 
 ```bash
 ./installer.sh
 ```
 
-## Commandes
+## Commands
 
-| Commande | Effet |
+| Command | Effect |
 |---|---|
-| `./kiyo info` | infos USB (firmware, puce, vitesse) |
-| `./kiyo list` | tous les réglages : valeur, min, max, défaut |
-| `./kiyo get focus brightness` | lire des réglages |
-| `./kiyo set focus_auto=0 focus=177` | régler (l'ordre est géré : les modes auto d'abord) |
-| `./kiyo focus-lock --profil perso` | cherche la meilleure mise au point en mesurant la netteté, puis la verrouille |
-| `./kiyo save perso` / `./kiyo load perso` | enregistrer / réappliquer un profil (`~/.config/kiyoctl/`) |
-| `./kiyo watch perso` | reste en veille et réapplique le profil à chaque branchement ou si la caméra se réinitialise |
-| `./kiyo reset` | tous les réglages par défaut |
-| `./kiyo xu-dump` | lecture seule des unités propriétaires Razer / Alpha Imaging |
+| `./kiyo info` | USB info (firmware, chip, link speed) |
+| `./kiyo list` | every control: value, min, max, default |
+| `./kiyo get focus brightness` | read controls |
+| `./kiyo set focus_auto=0 focus=177` | set controls (order handled: auto modes first) |
+| `./kiyo focus-lock --profil perso` | sweeps the focus, measures image sharpness, locks the sharpest position |
+| `./kiyo save perso` / `./kiyo load perso` | save / re-apply a profile (`~/.config/kiyoctl/`) |
+| `./kiyo watch perso` | stays running and re-applies the profile on every plug-in or camera reset |
+| `./kiyo reset` | restore all defaults |
+| `./kiyo xu-dump` | read-only dump of the proprietary Razer / Alpha Imaging units |
 
-`focus-lock` a besoin de filmer : lancez-le depuis l'app **Terminal**, qui a l'autorisation caméra.
+`focus-lock` needs to stream video: run it from the **Terminal** app, which has camera permission.
 
-## Réglages disponibles
+## Available controls
 
-| Réglage | Plage | Remarque |
+| Control | Range | Notes |
 |---|---|---|
-| `exposure_auto` | `manuel` (1) / `auto` (8) | la Kiyo refuse la valeur UVC « 2 » |
-| `exposure` | 3 – 2047 (× 100 µs) | seulement si `exposure_auto=manuel` |
-| `exposure_priority` | 0 / 1 | 1 = peut baisser les images/s pour éclaircir |
+| `exposure_auto` | `manuel` (1) / `auto` (8) | the Kiyo rejects the UVC value "2" |
+| `exposure` | 3 – 2047 (× 100 µs) | only when `exposure_auto=manuel` |
+| `exposure_priority` | 0 / 1 | 1 = may lower the frame rate to brighten |
 | `focus_auto` | 0 / 1 | |
-| `focus` | 0 – 255 | seulement si `focus_auto=0` |
-| `zoom` | 100 – 140 | 100 = champ le plus large |
-| `pantilt` | ±36000, ±36000 | utile seulement en zoom |
-| `brightness`, `contrast`, `saturation`, `sharpness` | 0 – 255 | défaut 128 |
+| `focus` | 0 – 255 | only when `focus_auto=0` |
+| `zoom` | 100 – 140 | 100 = widest field of view |
+| `pantilt` | ±36000, ±36000 | only useful when zoomed |
+| `brightness`, `contrast`, `saturation`, `sharpness` | 0 – 255 | default 128 |
 | `white_balance_auto` / `white_balance` | 0/1 · 2000 – 7500 K | |
-| `backlight` | 0 / 1 | compensation de contre-jour |
+| `backlight` | 0 / 1 | backlight compensation |
 | `gain` | 0 – 255 | |
-| `anti_flicker` | `off` / `50hz` / `60hz` | **50 Hz en Europe** |
+| `anti_flicker` | `off` / `50hz` / `60hz` | **50 Hz in Europe**, 60 Hz in North America |
 
-## Comment ça marche
+## How it works
 
-- La Kiyo expose : Camera Terminal (id 1), Processing Unit (id 3), deux Extension Units propriétaires (id 2 et 6).
-- macOS garde la caméra pour son pilote vidéo : libusb est refusé sans root. `uvcreq.c` passe par
-  **IOKit** (`IOUSBInterfaceInterface::ControlRequest` sur l'interface VideoControl), comme CameraController :
-  aucun droit spécial nécessaire.
-- La Kiyo d'origine **n'enregistre pas** ses réglages : ils sont perdus au débranchement.
-  Les profils sont donc gardés sur le Mac et réappliqués (`load`, `watch`, et au lancement de `webcam-pro/lancer.sh`).
+- The Kiyo exposes a Camera Terminal (id 1), a Processing Unit (id 3) and two proprietary Extension Units (ids 2 and 6).
+- macOS keeps the camera for its own video driver, so libusb is denied without root. `uvcreq.c` goes through
+  **IOKit** (`IOUSBInterfaceInterface::ControlRequest` on the VideoControl interface), like CameraController:
+  no special permissions required.
+- The original Kiyo **does not store** its settings: they are lost when unplugged.
+  Profiles are therefore kept on the Mac and re-applied (`load`, `watch`, and when `webcam-pro/lancer.sh` starts).
 
-## Ce qui n'est pas fait (volontairement)
+## Intentionally not done
 
-- **Firmware** : pas de firmware modifié possible (puce Alpha Imaging propriétaire, risque de rendre la caméra inutilisable).
-  Mise à jour officielle : outil Razer, **Windows uniquement**.
-- **Unités propriétaires** : `xu-dump` les lit sans rien écrire. L'unité 6 ressemble à une boîte aux lettres
-  de commandes (sélecteurs en écriture seule 1, 3, 4, 6 ; réponses en lecture 2, 5, 7, 8, 9 ; le sélecteur 10
-  renvoie le texte « 8455 », probablement la puce AIT8455). L'unité 2 donne accès à des adresses mémoire internes.
-  Le protocole de la « compensation de faible luminosité » de Synapse n'est pas documenté pour ce modèle :
-  écrire à l'aveugle dans ces unités pourrait corrompre la caméra, donc rien n'est envoyé.
+- **Firmware**: no custom firmware (proprietary Alpha Imaging chip, real risk of bricking the camera).
+  Official updates: Razer's tool, **Windows only**.
+- **Proprietary units**: `xu-dump` reads them without writing anything. Unit 6 looks like a command mailbox
+  (write-only selectors 1, 3, 4, 6; read-only responses 2, 5, 7, 8, 9; selector 10 returns the text "8455",
+  probably the AIT8455 chip). Unit 2 gives access to internal memory addresses.
+  The protocol behind Synapse's "low light compensation" is undocumented for this model:
+  writing blindly to these units could corrupt the camera, so nothing is sent.
 
-## Service automatique
+## Background service
 
 ```bash
-./service.sh installer perso   # réapplique « perso » à chaque branchement, au démarrage du Mac,
-                               # et si la caméra se réinitialise (vérification toutes les 30 s)
-./service.sh etat              # état + dernières lignes du journal (~/Library/Logs/kiyoctl.log)
-./service.sh retirer           # désinstaller
+./service.sh installer perso   # install: re-applies "perso" on every plug-in, at login,
+                               # and whenever the camera resets (checked every 30 s)
+./service.sh etat              # status + last log lines (~/Library/Logs/kiyoctl.log)
+./service.sh retirer           # uninstall
 ```
 
-Le service est un LaunchAgent (`~/Library/LaunchAgents/com.kiyoctl.watch.plist`). Ce dossier étant sur un
-disque externe, le service attend que le disque soit monté pour fonctionner.
+The service is a LaunchAgent (`~/Library/LaunchAgents/com.kiyoctl.watch.plist`).
+If this folder lives on an external drive, the service only works while that drive is mounted.
